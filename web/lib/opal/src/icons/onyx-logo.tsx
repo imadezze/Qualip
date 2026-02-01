@@ -9,18 +9,36 @@ const OnyxLogo = ({
   <svg
     width={width}
     height={height}
-    viewBox="0 0 56 56"
+    viewBox="0 0 100 100"
     xmlns="http://www.w3.org/2000/svg"
     className={className}
-    stroke="currentColor"
     {...props}
   >
-    <path
-      fillRule="evenodd"
-      clipRule="evenodd"
-      d="M28 0 10.869 7.77 28 15.539l17.131-7.77L28 0Zm0 40.461-17.131 7.77L28 56l17.131-7.77L28 40.461Zm20.231-29.592L56 28.001l-7.769 17.131L40.462 28l7.769-17.131ZM15.538 28 7.77 10.869 0 28l7.769 17.131L15.538 28Z"
-      fill="currentColor"
-    />
+    {/* LumiereAI Logo - 3x3 grid tilted */}
+    <g transform="rotate(-15, 50, 50)">
+      {/* Background layer (offset) */}
+      <g transform="translate(4, 4)" opacity="0.3">
+        <rect x="12" y="12" width="20" height="20" rx="4" fill="currentColor" stroke="currentColor" strokeWidth="2"/>
+        <rect x="40" y="12" width="20" height="20" rx="4" fill="currentColor" stroke="currentColor" strokeWidth="2"/>
+        <rect x="68" y="12" width="20" height="20" rx="4" fill="currentColor" stroke="currentColor" strokeWidth="2"/>
+        <rect x="12" y="40" width="20" height="20" rx="4" fill="currentColor" stroke="currentColor" strokeWidth="2"/>
+        <rect x="40" y="40" width="20" height="20" rx="4" fill="currentColor" stroke="currentColor" strokeWidth="2"/>
+        <rect x="68" y="40" width="20" height="20" rx="4" fill="currentColor" stroke="currentColor" strokeWidth="2"/>
+        <rect x="12" y="68" width="20" height="20" rx="4" fill="currentColor" stroke="currentColor" strokeWidth="2"/>
+        <rect x="40" y="68" width="20" height="20" rx="4" fill="currentColor" stroke="currentColor" strokeWidth="2"/>
+        <rect x="68" y="68" width="20" height="20" rx="4" fill="currentColor" stroke="currentColor" strokeWidth="2"/>
+      </g>
+      {/* Main grid */}
+      <rect x="12" y="12" width="20" height="20" rx="4" fill="currentColor" stroke="currentColor" strokeWidth="2"/>
+      <rect x="40" y="12" width="20" height="20" rx="4" fill="currentColor" stroke="currentColor" strokeWidth="2"/>
+      <rect x="68" y="12" width="20" height="20" rx="4" fill="currentColor" stroke="currentColor" strokeWidth="2"/>
+      <rect x="12" y="40" width="20" height="20" rx="4" fill="currentColor" stroke="currentColor" strokeWidth="2"/>
+      <rect x="40" y="40" width="20" height="20" rx="4" fill="currentColor" stroke="currentColor" strokeWidth="2"/>
+      <rect x="68" y="40" width="20" height="20" rx="4" fill="currentColor" stroke="currentColor" strokeWidth="2"/>
+      <rect x="12" y="68" width="20" height="20" rx="4" fill="currentColor" stroke="currentColor" strokeWidth="2"/>
+      <rect x="40" y="68" width="20" height="20" rx="4" fill="currentColor" stroke="currentColor" strokeWidth="2"/>
+      <rect x="68" y="68" width="20" height="20" rx="4" fill="currentColor" stroke="currentColor" strokeWidth="2"/>
+    </g>
   </svg>
 );
 export default OnyxLogo;
