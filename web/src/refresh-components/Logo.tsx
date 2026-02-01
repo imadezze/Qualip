@@ -95,11 +95,6 @@ export default function Logo({ folded, size, className }: LogoProps) {
   }
 
   // Handle "logo_and_name" or default behavior
-  return applicationName ? (
-    renderNameAndPoweredBy({ includeLogo: true, includeName: true })
-  ) : folded ? (
-    <OnyxIcon size={foldedSize} className={cn("flex-shrink-0", className)} />
-  ) : (
-    <OnyxLogoTypeIcon size={unfoldedSize} className={className} />
-  );
+  // Always show "CertiBot" name with logo instead of embedded "onyx" text
+  return renderNameAndPoweredBy({ includeLogo: true, includeName: true });
 }
