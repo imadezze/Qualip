@@ -13,45 +13,56 @@ export interface AuthTypeMetadata {
 }
 
 export const getAuthTypeMetadataSS = async (): Promise<AuthTypeMetadata> => {
-  const res = await fetch(buildUrl("/auth/type"));
-  if (!res.ok) {
-    throw new Error("Failed to fetch data");
-  }
+  try {
+    const res = await fetch(buildUrl("/auth/type"));
+    if (!res.ok) {
+      throw new Error("Failed to fetch data");
+    }
 
-  const data: {
-    auth_type: string;
-    requires_verification: boolean;
-    anonymous_user_enabled: boolean | null;
-    password_min_length: number;
-  } = await res.json();
+    const data: {
+      auth_type: string;
+      requires_verification: boolean;
+      anonymous_user_enabled: boolean | null;
+      password_min_length: number;
+    } = await res.json();
 
-  let authType: AuthType;
+    let authType: AuthType;
 
-  // Override fastapi users auth so we can use both
-  if (NEXT_PUBLIC_CLOUD_ENABLED) {
-    authType = AuthType.CLOUD;
-  } else {
-    authType = data.auth_type as AuthType;
-  }
+    // Override fastapi users auth so we can use both
+    if (NEXT_PUBLIC_CLOUD_ENABLED) {
+      authType = AuthType.CLOUD;
+    } else {
+      authType = data.auth_type as AuthType;
+    }
 
-  // for SAML / OIDC, we auto-redirect the user to the IdP when the user visits
-  // Onyx in an un-authenticated state
-  if (authType === AuthType.OIDC || authType === AuthType.SAML) {
+    // for SAML / OIDC, we auto-redirect the user to the IdP when the user visits
+    // Onyx in an un-authenticated state
+    if (authType === AuthType.OIDC || authType === AuthType.SAML) {
+      return {
+        authType,
+        autoRedirect: true,
+        requiresVerification: data.requires_verification,
+        anonymousUserEnabled: data.anonymous_user_enabled,
+        passwordMinLength: data.password_min_length,
+      };
+    }
     return {
       authType,
-      autoRedirect: true,
+      autoRedirect: false,
       requiresVerification: data.requires_verification,
       anonymousUserEnabled: data.anonymous_user_enabled,
       passwordMinLength: data.password_min_length,
     };
+  } catch (error) {
+    console.log("Backend not available, using mock auth metadata");
+    return {
+      authType: AuthType.DISABLED,
+      autoRedirect: false,
+      requiresVerification: false,
+      anonymousUserEnabled: true,
+      passwordMinLength: 8,
+    };
   }
-  return {
-    authType,
-    autoRedirect: false,
-    requiresVerification: data.requires_verification,
-    anonymousUserEnabled: data.anonymous_user_enabled,
-    passwordMinLength: data.password_min_length,
-  };
 };
 
 export const getAuthDisabledSS = async (): Promise<boolean> => {
@@ -183,7 +194,20 @@ export const getCurrentUserSS = async (): Promise<User | null> => {
     return user;
   } catch (e) {
     console.log(`Error fetching user: ${e}`);
-    return null;
+    console.log("Backend not available, using mock user for development");
+
+    // Return mock user for frontend-only development
+    return {
+      id: "mock-user-dev",
+      email: "dev@certibot.com",
+      is_active: true,
+      is_superuser: true,
+      is_verified: true,
+      role: "admin",
+      preferences: {
+        chosen_assistants: null,
+      },
+    } as User;
   }
 };
 

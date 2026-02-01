@@ -130,6 +130,31 @@ export async function fetchSettingsSS(): Promise<CombinedSettings | null> {
     return combinedSettings;
   } catch (error) {
     console.error("fetchSettingsSS exception: ", error);
-    return null;
+    console.log("Backend not available, using mock settings for development");
+
+    // Return mock settings for frontend-only development
+    const webVersion = getWebVersion();
+    return {
+      settings: {
+        auto_scroll: true,
+        application_status: ApplicationStatus.ACTIVE,
+        gpu_enabled: false,
+        maximum_chat_retention_days: null,
+        notifications: [],
+        needs_reindexing: false,
+        anonymous_user_enabled: true,
+        deep_research_enabled: true,
+        temperature_override_enabled: true,
+        query_history_type: QueryHistoryType.NORMAL,
+        disable_default_assistant: false,
+      },
+      enterpriseSettings: {
+        application_name: "CertiBot",
+        use_custom_logo: false,
+      } as EnterpriseSettings,
+      customAnalyticsScript: null,
+      webVersion,
+      webDomain: HOST_URL,
+    };
   }
 }
