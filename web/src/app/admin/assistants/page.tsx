@@ -47,7 +47,7 @@ function MainContent({
   return (
     <div>
       <Text className="mb-2">
-        Assistants are a way to build custom search/question-answering
+        CertiBots are a way to build custom search/question-answering
         experiences for different use cases.
       </Text>
       <Text className="mt-2">They allow you to customize:</Text>
@@ -63,20 +63,20 @@ function MainContent({
       <div>
         <Separator />
 
-        <Title>Create an Assistant</Title>
+        <Title>Create a CertiBot</Title>
         <CreateButton href="/chat/agents/create?admin=true">
-          New Assistant
+          New CertiBot
         </CreateButton>
 
         <Separator />
 
-        <Title>Existing Assistants</Title>
+        <Title>Existing CertiBots</Title>
         {totalItems > 0 ? (
           <>
             <SubLabel>
-              Assistants will be displayed as options on the Chat / Search
-              interfaces in the order they are displayed below. Assistants
-              marked as hidden will not be displayed. Editable assistants are
+              CertiBots will be displayed as options on the Chat / Search
+              interfaces in the order they are displayed below. CertiBots
+              marked as hidden will not be displayed. Editable CertiBots are
               shown at the top.
             </SubLabel>
             <PersonasTable
@@ -96,21 +96,21 @@ function MainContent({
         ) : (
           <div className="mt-6 p-8 border border-border rounded-lg bg-background-weak text-center">
             <Text className="text-lg font-medium mb-2">
-              No custom assistants yet
+              No custom CertiBots yet
             </Text>
             <Text className="text-subtle mb-3">
-              Create your first assistant to:
+              Create your first CertiBot to:
             </Text>
             <ul className="text-subtle text-sm list-disc text-left inline-block mb-3">
               <li>Build department-specific knowledge bases</li>
-              <li>Create specialized research assistants</li>
+              <li>Create specialized research CertiBots</li>
               <li>Set up compliance and policy advisors</li>
             </ul>
             <Text className="text-subtle text-sm mb-4">
               ...and so much more!
             </Text>
             <CreateButton href="/chat/agents/create?admin=true">
-              Create Your First Assistant
+              Create Your First CertiBot
             </CreateButton>
             <div className="mt-6 pt-6 border-t border-border">
               <Text className="text-subtle text-sm">
@@ -121,7 +121,7 @@ function MainContent({
                 >
                   here
                 </a>{" "}
-                to adjust the Default Assistant
+                to adjust the Default CertiBot
               </Text>
             </div>
           </div>
@@ -140,13 +140,13 @@ export default function Page() {
 
   return (
     <>
-      <AdminPageTitle icon={SvgOnyxOctagon} title="Assistants" />
+      <AdminPageTitle icon={SvgOnyxOctagon} title="CertiBots" />
 
       {isLoading && <ThreeDotsLoader />}
 
       {error && (
         <ErrorCallout
-          errorTitle="Failed to load assistants"
+          errorTitle="Failed to load CertiBots"
           errorMsg={
             error?.info?.message ||
             error?.info?.detail ||

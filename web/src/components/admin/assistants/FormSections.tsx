@@ -58,7 +58,7 @@ export const SystemPromptField = memo(function SystemPromptField() {
           name="system_prompt"
           label="Instructions"
           isTextArea={true}
-          placeholder="You are a professional email writing assistant that always uses a polite enthusiastic tone, emphasizes action items, and leaves blanks for the human to fill in when you have unknowns"
+          placeholder="You are a professional Qualiopi compliance CertiBot that helps organizations verify their training quality certification requirements"
           data-testid="assistant-instructions-input"
           className="[&_textarea]:placeholder:text-text-muted/50"
         />

@@ -311,7 +311,7 @@ export default function NRFPage({ isSidePanel = false }: NRFPageProps) {
             rightIcon={SvgExternalLink}
             onClick={handleOpenInOnyx}
           >
-            Open in Onyx
+            Open in CertiBot
           </Button>
         </header>
       )}
@@ -421,8 +421,8 @@ export default function NRFPage({ isSidePanel = false }: NRFPageProps) {
                   )}
                 >
                   {isNight
-                    ? "End your day with Onyx"
-                    : "Start your day with Onyx"}
+                    ? "End your day with CertiBot"
+                    : "Start your day with CertiBot"}
                 </Text>
 
                 <ChatInputBar
@@ -466,8 +466,8 @@ export default function NRFPage({ isSidePanel = false }: NRFPageProps) {
             <Modal.Content width="sm">
               <Modal.Header
                 icon={SvgAlertTriangle}
-                title="Turn off Onyx new tab page?"
-                description="You'll see your browser's default new tab page instead. You can turn it back on anytime in your Onyx settings."
+                title="Turn off CertiBot new tab page?"
+                description="You'll see your browser's default new tab page instead. You can turn it back on anytime in your CertiBot settings."
                 onClose={() => setShowTurnOffModal(false)}
               />
               <Modal.Footer>

@@ -12,16 +12,16 @@ export default function NoAssistantModal() {
   return (
     <Modal open>
       <Modal.Content width="sm" height="sm">
-        <Modal.Header icon={SvgUser} title="No Assistant Available" />
+        <Modal.Header icon={SvgUser} title="No CertiBot Available" />
         <Modal.Body>
           <Text as="p">
-            You currently have no assistant configured. To use this feature, you
+            You currently have no CertiBot configured. To use this feature, you
             need to take action.
           </Text>
           {isAdmin ? (
             <>
               <Text as="p">
-                As an administrator, you can create a new assistant by visiting
+                As an administrator, you can create a new CertiBot by visiting
                 the admin panel.
               </Text>
               <Button className="w-full" href="/admin/assistants">
@@ -30,7 +30,7 @@ export default function NoAssistantModal() {
             </>
           ) : (
             <Text as="p">
-              Please contact your administrator to configure an assistant for
+              Please contact your administrator to configure a CertiBot for
               you.
             </Text>
           )}

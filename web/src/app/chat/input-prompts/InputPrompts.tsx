@@ -141,7 +141,7 @@ export default function InputPrompts() {
         <div className="flex flex-col gap-2">
           <Text headingH3>Prompt Shortcuts</Text>
           <Text>
-            Manage and customize prompt shortcuts for your assistants. Use your
+            Manage and customize prompt shortcuts for your CertiBots. Use your
             prompt shortcuts by starting a new message with &quot;/&quot; in
             chat.
           </Text>

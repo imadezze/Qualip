@@ -114,7 +114,7 @@ function SettingsPopover({
             icon={SvgExternalLink}
             onClick={() =>
               window.open(
-                "https://docs.onyx.app",
+                "https://docs.certibot.com",
                 "_blank",
                 "noopener,noreferrer"
               )

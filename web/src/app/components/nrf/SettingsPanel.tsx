@@ -174,7 +174,7 @@ export const SettingsPanel = ({
               General
             </Text>
             <div className="nrf-settings-section-content">
-              <SettingRow label="Use Onyx as new tab page">
+              <SettingRow label="Use CertiBot as new tab page">
                 <Switch
                   checked={useOnyxAsNewTab}
                   onCheckedChange={handleUseOnyxToggle}

@@ -514,7 +514,7 @@ const ChatInputBar = React.memo(
               style={{ scrollbarWidth: "thin" }}
               role="textarea"
               aria-multiline
-              placeholder="How can I help you today"
+              placeholder="Ask CertiBot about Qualiopi compliance..."
               value={message}
               onKeyDown={(event) => {
                 if (

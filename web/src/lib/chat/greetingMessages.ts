@@ -1,4 +1,4 @@
-export const GREETING_MESSAGES = ["How can I help?", "Let's get started."];
+export const GREETING_MESSAGES = ["How can CertiBot help you today?", "Ready to check your Qualiopi compliance."];
 
 export function getRandomGreeting(): string {
   return GREETING_MESSAGES[

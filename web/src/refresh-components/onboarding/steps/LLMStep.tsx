@@ -133,7 +133,7 @@ const LLMStepInner = ({
                 Connect your LLM models
               </Text>
               <Text as="p" text03 secondaryBody>
-                Onyx supports both self-hosted models and popular providers.
+                CertiBot supports both self-hosted models and popular providers.
               </Text>
             </div>
           </div>

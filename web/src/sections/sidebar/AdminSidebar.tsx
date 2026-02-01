@@ -83,7 +83,7 @@ const custom_assistants_items = (
 ) => {
   const items = [
     {
-      name: "Assistants",
+      name: "CertiBots",
       icon: SvgOnyxOctagon,
       link: "/admin/assistants",
     },
@@ -138,7 +138,7 @@ const collections = (
     items: document_management_items(),
   },
   {
-    name: "Custom Assistants",
+    name: "Custom CertiBots",
     items: custom_assistants_items(isCurator, enableEnterprise),
   },
   ...(isCurator
@@ -161,7 +161,7 @@ const collections = (
           name: "Configuration",
           items: [
             {
-              name: "Default Assistant",
+              name: "CertiBot Settings",
               icon: SvgOnyxLogo,
               link: "/admin/configuration/default-assistant",
             },

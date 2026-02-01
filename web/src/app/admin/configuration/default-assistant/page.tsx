@@ -96,11 +96,11 @@ function DefaultAssistantConfig() {
         {popup}
         <Callout type="notice">
           <p className="mb-3">
-            The default assistant is currently disabled in your workspace
+            The default CertiBot is currently disabled in your workspace
             settings.
           </p>
           <p>
-            To configure the default assistant, you must first enable it in{" "}
+            To configure the default CertiBot, you must first enable it in{" "}
             <Link href="/admin/settings" className="text-link font-medium">
               Workspace Settings
             </Link>
@@ -170,12 +170,12 @@ function DefaultAssistantConfig() {
             await refreshAgents();
 
             setPopup({
-              message: "Default assistant updated successfully!",
+              message: "Default CertiBot updated successfully!",
               type: "success",
             });
           } catch (error: any) {
             setPopup({
-              message: error.message || "Failed to update assistant",
+              message: error.message || "Failed to update CertiBot",
               type: "error",
             });
           } finally {
@@ -189,8 +189,8 @@ function DefaultAssistantConfig() {
               <div className="mt-4">
                 <Text as="p" className="text-text-dark">
                   Configure which capabilities are enabled for the default
-                  assistant in chat. These settings apply to all users who
-                  haven&apos;t customized their assistant preferences.
+                  CertiBot in chat. These settings apply to all users who
+                  haven&apos;t customized their CertiBot preferences.
                 </Text>
               </div>
 
@@ -209,7 +209,7 @@ function DefaultAssistantConfig() {
                 </div>
                 <div className="flex items-start gap-1.5 mb-1">
                   <SubLabel>
-                    Add instructions to tailor the behavior of the assistant.
+                    Add instructions to tailor the behavior of the CertiBot.
                   </SubLabel>
                   <HoverPopup
                     mainContent={
@@ -299,7 +299,7 @@ export default function Page() {
   return (
     <>
       <AdminPageTitle
-        title="Default Assistant"
+        title="CertiBot Configuration"
         icon={
           <SvgOnyxLogo
             width={32}
