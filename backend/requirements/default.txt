@@ -267,6 +267,8 @@ fastmcp==2.14.2
     # via onyx
 fastuuid==0.14.0
     # via litellm
+fpdf2==2.8.3
+    # via onyx (pdf generator tool)
 filelock==3.20.3
     # via
     #   huggingface-hub

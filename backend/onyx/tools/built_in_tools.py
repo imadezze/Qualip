@@ -7,7 +7,13 @@ from onyx.tools.tool_implementations.images.image_generation_tool import (
 from onyx.tools.tool_implementations.knowledge_graph.knowledge_graph_tool import (
     KnowledgeGraphTool,
 )
+from onyx.tools.tool_implementations.email_sender.email_sender_tool import (
+    EmailSenderTool,
+)
 from onyx.tools.tool_implementations.open_url.open_url_tool import OpenURLTool
+from onyx.tools.tool_implementations.pdf_generator.pdf_generator_tool import (
+    PDFGeneratorTool,
+)
 from onyx.tools.tool_implementations.python.python_tool import PythonTool
 from onyx.tools.tool_implementations.search.search_tool import SearchTool
 from onyx.tools.tool_implementations.web_search.web_search_tool import (
@@ -25,6 +31,8 @@ BUILT_IN_TOOL_TYPES = Union[
     KnowledgeGraphTool,
     OpenURLTool,
     PythonTool,
+    PDFGeneratorTool,
+    EmailSenderTool,
 ]
 
 BUILT_IN_TOOL_MAP: dict[str, Type[BUILT_IN_TOOL_TYPES]] = {
@@ -34,6 +42,8 @@ BUILT_IN_TOOL_MAP: dict[str, Type[BUILT_IN_TOOL_TYPES]] = {
     KnowledgeGraphTool.__name__: KnowledgeGraphTool,
     OpenURLTool.__name__: OpenURLTool,
     PythonTool.__name__: PythonTool,
+    PDFGeneratorTool.__name__: PDFGeneratorTool,
+    EmailSenderTool.__name__: EmailSenderTool,
 }
 
 STOPPING_TOOLS_NAMES: list[str] = [ImageGenerationTool.NAME]

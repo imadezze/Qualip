@@ -990,6 +990,20 @@ S3_GENERATE_LOCAL_CHECKSUM = (
     os.environ.get("S3_GENERATE_LOCAL_CHECKSUM", "").lower() == "true"
 )
 
+# Google Cloud Storage Configuration (for PDF Generator Tool)
+GCS_BUCKET_NAME = os.environ.get("GCS_BUCKET_NAME")
+GCS_PROJECT_ID = os.environ.get("GCS_PROJECT_ID")
+GCS_SERVICE_ACCOUNT_JSON = os.environ.get("GCS_SERVICE_ACCOUNT_JSON")
+GCS_SIGNED_URL_EXPIRY_HOURS = int(os.environ.get("GCS_SIGNED_URL_EXPIRY_HOURS", "24"))
+
+# Email Sender Tool Configuration (Gmail / Google Workspace SMTP)
+EMAIL_TOOL_SMTP_SERVER = os.environ.get("EMAIL_TOOL_SMTP_SERVER", "smtp.gmail.com")
+EMAIL_TOOL_SMTP_PORT = int(os.environ.get("EMAIL_TOOL_SMTP_PORT", "587"))
+EMAIL_TOOL_SMTP_USER = os.environ.get("EMAIL_TOOL_SMTP_USER")
+EMAIL_TOOL_SMTP_PASSWORD = os.environ.get("EMAIL_TOOL_SMTP_PASSWORD")
+EMAIL_TOOL_FROM_ADDRESS = os.environ.get("EMAIL_TOOL_FROM_ADDRESS")
+EMAIL_TOOL_FROM_NAME = os.environ.get("EMAIL_TOOL_FROM_NAME")
+
 # Forcing Vespa Language
 # English: en, German:de, etc. See: https://docs.vespa.ai/en/linguistics.html
 VESPA_LANGUAGE_OVERRIDE = os.environ.get("VESPA_LANGUAGE_OVERRIDE")
