@@ -348,8 +348,14 @@ _URL_EXTRACTION_PATTERN = re.compile(
     re.IGNORECASE,
 )
 
+# Characters that commonly appear after URLs in natural text
+_TRAILING_PUNCTUATION = ".,;:!?)]}>'\""
 
-def extract_urls_from_text(text: str) -> list[str]:
+# Minimum length for a valid URL (scheme + :// + at least 1 char domain)
+_MIN_URL_LENGTH = 10  # https://a.b
+
+
+def extract_urls_from_text(text: str | None) -> list[str]:
     """
     Extract valid HTTP/HTTPS URLs from a text string.
 
@@ -357,33 +363,61 @@ def extract_urls_from_text(text: str) -> list[str]:
     crawled in addition to searching indexed content.
 
     Args:
-        text: The text to search for URLs
+        text: The text to search for URLs (can be None)
 
     Returns:
-        List of valid URLs found in the text (deduplicated, order preserved)
+        List of valid URLs found in the text (deduplicated, order preserved).
+        Returns empty list for None or empty input.
     """
-    if not text:
+    if not text or not isinstance(text, str):
         return []
 
-    matches = _URL_EXTRACTION_PATTERN.findall(text)
+    try:
+        matches = _URL_EXTRACTION_PATTERN.findall(text)
+    except Exception:
+        # Regex failure on malformed input shouldn't crash
+        return []
+
+    if not matches:
+        return []
 
     # Validate and deduplicate
     seen: set[str] = set()
     valid_urls: list[str] = []
 
     for url in matches:
-        # Clean up trailing punctuation that might have been captured
-        url = url.rstrip(".,;:!?)")
+        if not url:
+            continue
 
+        # Clean up trailing punctuation that might have been captured
+        # Strip repeatedly to handle cases like "https://example.com?q=test)."
+        original_len = len(url)
+        while url and url[-1] in _TRAILING_PUNCTUATION:
+            url = url[:-1]
+            # Safety: prevent infinite loop on pathological input
+            if len(url) < _MIN_URL_LENGTH:
+                break
+
+        # Skip if URL became too short after stripping
+        if len(url) < _MIN_URL_LENGTH:
+            continue
+
+        # Skip duplicates (case-sensitive - URLs are case-sensitive in path)
         if url in seen:
             continue
 
         try:
             parsed = urlparse(url)
-            if parsed.scheme in ("http", "https") and parsed.netloc:
+            # Validate: must have scheme and netloc (domain)
+            if (
+                parsed.scheme in ("http", "https")
+                and parsed.netloc
+                and len(parsed.netloc) >= 3  # Minimum domain like "a.b"
+            ):
                 seen.add(url)
                 valid_urls.append(url)
         except Exception:
+            # Skip malformed URLs
             continue
 
     return valid_urls

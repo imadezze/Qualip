@@ -127,6 +127,10 @@ logger = setup_logger()
 
 QUERIES_FIELD = "queries"
 
+# Maximum number of URLs to crawl from user query to prevent abuse
+# and excessive latency. URLs beyond this limit are silently dropped.
+MAX_CRAWL_URLS = 20
+
 
 def deduplicate_queries(
     queries_with_weights: list[tuple[str, float]],
@@ -249,6 +253,8 @@ class SearchTool(Tool[SearchToolOverrideKwargs]):
         slack_context: SlackContext | None = None,
         # Whether to enable Slack federated search
         enable_slack_search: bool = True,
+        # Whether to enable URL crawling (activated by WebSearch toggle)
+        enable_url_crawling: bool = False,
     ) -> None:
         super().__init__(emitter=emitter)
 
@@ -261,6 +267,7 @@ class SearchTool(Tool[SearchToolOverrideKwargs]):
         self.bypass_acl = bypass_acl
         self.slack_context = slack_context
         self.enable_slack_search = enable_slack_search
+        self.enable_url_crawling = enable_url_crawling
 
         # Store session factory instead of session for thread-safety
         # When tools are called in parallel, each thread needs its own session
@@ -469,28 +476,53 @@ class SearchTool(Tool[SearchToolOverrideKwargs]):
             urls: List of URLs to crawl
 
         Returns:
-            List of InferenceChunk results from crawled content
+            List of InferenceChunk results from crawled content.
+            Returns empty list on any failure to ensure search continues.
         """
         if not urls:
             return []
 
+        # Enforce URL limit to prevent abuse and excessive latency
+        if len(urls) > MAX_CRAWL_URLS:
+            logger.warning(
+                f"Query contains {len(urls)} URLs, limiting to {MAX_CRAWL_URLS}"
+            )
+            urls = urls[:MAX_CRAWL_URLS]
+
         try:
+            # Get content provider inside try block to catch initialization errors
             content_provider = get_default_content_provider()
+            if content_provider is None:
+                logger.warning("No content provider available for URL crawling")
+                return []
+
             web_contents = content_provider.contents(urls)
+            if not web_contents:
+                logger.debug("Content provider returned no results")
+                return []
 
             chunks: list[InferenceChunk] = []
             for rank, content in enumerate(web_contents):
+                # Guard against None or malformed content objects
+                if content is None:
+                    continue
+
                 # Only include successfully crawled content with substance
                 if (
-                    content.scrape_successful
-                    and content.full_content
+                    getattr(content, "scrape_successful", False)
+                    and getattr(content, "full_content", None)
                     and len(content.full_content.strip()) > 50
                 ):
-                    section = inference_section_from_internet_page_scrape(
-                        content, rank=rank
-                    )
-                    # Extract the center chunk from the section
-                    chunks.append(section.center_chunk)
+                    try:
+                        section = inference_section_from_internet_page_scrape(
+                            content, rank=rank
+                        )
+                        chunks.append(section.center_chunk)
+                    except Exception as e:
+                        logger.debug(
+                            f"Failed to convert crawled content to chunk: {e}"
+                        )
+                        continue
 
             logger.debug(
                 f"Crawled {len(chunks)} URLs successfully out of {len(urls)} requested"
@@ -498,6 +530,7 @@ class SearchTool(Tool[SearchToolOverrideKwargs]):
             return chunks
 
         except Exception as e:
+            # Log but don't raise - URL crawling failure shouldn't break search
             logger.warning(f"Error crawling URLs in search tool: {e}")
             return []
 
@@ -741,19 +774,21 @@ class SearchTool(Tool[SearchToolOverrideKwargs]):
             # Extract and crawl URLs from the original query
             # This enables combining indexed results with fresh web content
             # when users include URLs in their questions
-            urls_in_query = extract_urls_from_text(override_kwargs.original_query or "")
-            if urls_in_query:
-                logger.info(
-                    f"Found {len(urls_in_query)} URL(s) in query, adding to search: {urls_in_query}"
-                )
-                search_functions.append(
-                    (
-                        self._crawl_urls,
-                        (urls_in_query,),
+            # Only enabled when WebSearch toggle is activated
+            if self.enable_url_crawling:
+                urls_in_query = extract_urls_from_text(override_kwargs.original_query or "")
+                if urls_in_query:
+                    logger.info(
+                        f"Found {len(urls_in_query)} URL(s) in query, adding to search: {urls_in_query}"
                     )
-                )
-                # Give crawled URLs high weight since user explicitly mentioned them
-                search_weights.append(ORIGINAL_QUERY_WEIGHT * 1.5)
+                    search_functions.append(
+                        (
+                            self._crawl_urls,
+                            (urls_in_query,),
+                        )
+                    )
+                    # Use same weight as other parallel searches (Slack, original query)
+                    search_weights.append(ORIGINAL_QUERY_WEIGHT)
 
             # Run all searches in parallel (Vespa queries + Slack + URL crawling)
             all_search_results = run_functions_tuples_in_parallel(search_functions)
