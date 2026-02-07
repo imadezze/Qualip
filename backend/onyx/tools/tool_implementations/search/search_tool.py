@@ -112,7 +112,16 @@ from onyx.tools.tool_implementations.utils import (
 from onyx.utils.logger import setup_logger
 from onyx.utils.threadpool_concurrency import run_functions_tuples_in_parallel
 from onyx.utils.timing import log_function_time
+from onyx.utils.url import extract_urls_from_text
 from shared_configs.configs import DOC_EMBEDDING_CONTEXT_SIZE
+
+# Import for URL crawling functionality
+from onyx.tools.tool_implementations.web_search.providers import (
+    get_default_content_provider,
+)
+from onyx.tools.tool_implementations.web_search.utils import (
+    inference_section_from_internet_page_scrape,
+)
 
 logger = setup_logger()
 
@@ -449,6 +458,49 @@ class SearchTool(Tool[SearchToolOverrideKwargs]):
         finally:
             search_db_session.close()
 
+    def _crawl_urls(self, urls: list[str]) -> list[InferenceChunk]:
+        """Crawl URLs found in the user query and return as InferenceChunks.
+
+        This enables the search tool to include fresh web content from URLs
+        explicitly mentioned in the user's query, combining indexed results
+        with live crawled content.
+
+        Args:
+            urls: List of URLs to crawl
+
+        Returns:
+            List of InferenceChunk results from crawled content
+        """
+        if not urls:
+            return []
+
+        try:
+            content_provider = get_default_content_provider()
+            web_contents = content_provider.contents(urls)
+
+            chunks: list[InferenceChunk] = []
+            for rank, content in enumerate(web_contents):
+                # Only include successfully crawled content with substance
+                if (
+                    content.scrape_successful
+                    and content.full_content
+                    and len(content.full_content.strip()) > 50
+                ):
+                    section = inference_section_from_internet_page_scrape(
+                        content, rank=rank
+                    )
+                    # Extract the center chunk from the section
+                    chunks.append(section.center_chunk)
+
+            logger.debug(
+                f"Crawled {len(chunks)} URLs successfully out of {len(urls)} requested"
+            )
+            return chunks
+
+        except Exception as e:
+            logger.warning(f"Error crawling URLs in search tool: {e}")
+            return []
+
     @classmethod
     def is_available(cls, db_session: Session) -> bool:
         """Check if search tool is available.
@@ -686,7 +738,24 @@ class SearchTool(Tool[SearchToolOverrideKwargs]):
                 # Use same weight as original query for Slack results
                 search_weights.append(ORIGINAL_QUERY_WEIGHT)
 
-            # Run all searches in parallel (Vespa queries + Slack)
+            # Extract and crawl URLs from the original query
+            # This enables combining indexed results with fresh web content
+            # when users include URLs in their questions
+            urls_in_query = extract_urls_from_text(override_kwargs.original_query or "")
+            if urls_in_query:
+                logger.info(
+                    f"Found {len(urls_in_query)} URL(s) in query, adding to search: {urls_in_query}"
+                )
+                search_functions.append(
+                    (
+                        self._crawl_urls,
+                        (urls_in_query,),
+                    )
+                )
+                # Give crawled URLs high weight since user explicitly mentioned them
+                search_weights.append(ORIGINAL_QUERY_WEIGHT * 1.5)
+
+            # Run all searches in parallel (Vespa queries + Slack + URL crawling)
             all_search_results = run_functions_tuples_in_parallel(search_functions)
 
             # Merge results using weighted Reciprocal Rank Fusion

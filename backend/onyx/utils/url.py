@@ -337,3 +337,53 @@ def add_url_params(url: str, params: dict) -> str:
     )
 
     return new_url
+
+
+# Regex pattern for extracting URLs from text
+# Matches http:// and https:// URLs, stopping at whitespace or common delimiters
+import re
+
+_URL_EXTRACTION_PATTERN = re.compile(
+    r'https?://[^\s<>"\'{}|\\^`\[\]]+',
+    re.IGNORECASE,
+)
+
+
+def extract_urls_from_text(text: str) -> list[str]:
+    """
+    Extract valid HTTP/HTTPS URLs from a text string.
+
+    This is useful for detecting URLs in user queries that should be
+    crawled in addition to searching indexed content.
+
+    Args:
+        text: The text to search for URLs
+
+    Returns:
+        List of valid URLs found in the text (deduplicated, order preserved)
+    """
+    if not text:
+        return []
+
+    matches = _URL_EXTRACTION_PATTERN.findall(text)
+
+    # Validate and deduplicate
+    seen: set[str] = set()
+    valid_urls: list[str] = []
+
+    for url in matches:
+        # Clean up trailing punctuation that might have been captured
+        url = url.rstrip(".,;:!?)")
+
+        if url in seen:
+            continue
+
+        try:
+            parsed = urlparse(url)
+            if parsed.scheme in ("http", "https") and parsed.netloc:
+                seen.add(url)
+                valid_urls.append(url)
+        except Exception:
+            continue
+
+    return valid_urls
