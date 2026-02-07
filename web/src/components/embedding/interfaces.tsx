@@ -62,6 +62,7 @@ export interface EmbeddingModelDescriptor {
 
 export interface CloudEmbeddingModel extends EmbeddingModelDescriptor {
   pricePerMillion: number;
+  isDefault?: boolean;
 }
 
 export interface HostedEmbeddingModel extends EmbeddingModelDescriptor {
@@ -191,7 +192,7 @@ export const AVAILABLE_CLOUD_PROVIDERS: CloudEmbeddingProvider[] = [
         provider_type: EmbeddingProvider.COHERE,
         model_name: "embed-multilingual-v3.0",
         description:
-          "Cohere's multilingual embedding model. Best for English + French and 100+ languages.",
+          "Cohere's multilingual embedding model. Best for English + French and 100+ languages. Recommended default.",
         pricePerMillion: 0.1,
         model_dim: 1024,
         normalize: false,
@@ -200,6 +201,7 @@ export const AVAILABLE_CLOUD_PROVIDERS: CloudEmbeddingProvider[] = [
         index_name: "",
         api_key: null,
         api_url: null,
+        isDefault: true,
       },
       {
         provider_type: EmbeddingProvider.COHERE,
@@ -244,6 +246,21 @@ export const AVAILABLE_CLOUD_PROVIDERS: CloudEmbeddingProvider[] = [
         api_url: null,
       },
     ],
+    default_model: {
+      provider_type: EmbeddingProvider.COHERE,
+      model_name: "embed-multilingual-v3.0",
+      description:
+        "Cohere's multilingual embedding model. Best for English + French and 100+ languages. Recommended default.",
+      pricePerMillion: 0.1,
+      model_dim: 1024,
+      normalize: false,
+      query_prefix: "",
+      passage_prefix: "",
+      index_name: "",
+      api_key: null,
+      api_url: null,
+      isDefault: true,
+    },
   },
   {
     provider_type: EmbeddingProvider.OPENAI,
