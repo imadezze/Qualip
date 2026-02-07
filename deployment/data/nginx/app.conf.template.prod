@@ -111,7 +111,16 @@ server {
 
     client_max_body_size 5G;    # Maximum upload size
 
-    location / {
+    access_log /var/log/nginx/access.log custom_main;
+
+    # Conditionally include MCP location configuration
+    include /etc/nginx/conf.d/mcp.conf.inc;
+
+    # Match both /api/* and /openapi.json in a single rule
+    location ~ ^/(api|openapi.json)(/.*)?$ {
+        # Rewrite /api prefixed matched paths
+        rewrite ^/api(/.*)$ $1 break;
+
         # misc headers
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -121,6 +130,7 @@ server {
         proxy_set_header X-Forwarded-Port $server_port;
         proxy_set_header Host $host;
 
+        # need to use 1.1 to support chunked transfers
         proxy_http_version 1.1;
         proxy_buffering off;
 
@@ -132,7 +142,34 @@ server {
         # we don't want nginx trying to do something clever with
         # redirects, we set the Host: header above already.
         proxy_redirect off;
-        proxy_pass http://localhost:80;
+        proxy_pass http://api_server;
+    }
+
+    location / {
+        # misc headers
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        # don't use forwarded schema, host, or port here - this is the entry point
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-Port $server_port;
+        proxy_set_header Host $host;
+
+        proxy_http_version 1.1;
+
+        # timeout settings
+        proxy_connect_timeout ${NGINX_PROXY_CONNECT_TIMEOUT}s;
+        proxy_send_timeout ${NGINX_PROXY_SEND_TIMEOUT}s;
+        proxy_read_timeout ${NGINX_PROXY_READ_TIMEOUT}s;
+
+        # we don't want nginx trying to do something clever with
+        # redirects, we set the Host: header above already.
+        proxy_redirect off;
+        proxy_pass http://web_server;
+    }
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
     }
 
     ssl_certificate /etc/letsencrypt/live/${DOMAIN}/fullchain.pem;

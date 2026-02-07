@@ -665,10 +665,20 @@ def convert_chat_history(
                             )
                         )
 
+                        # Use actual tool response if available, otherwise use placeholder
+                        tool_response = tool_call.tool_call_response
+                        if tool_response:
+                            # Count tokens in the response
+                            response_token_count = token_counter(tool_response)
+                        else:
+                            # Fallback to placeholder if response is missing
+                            tool_response = TOOL_CALL_RESPONSE_CROSS_MESSAGE
+                            response_token_count = 20
+
                         simple_messages.append(
                             ChatMessageSimple(
-                                message=TOOL_CALL_RESPONSE_CROSS_MESSAGE,
-                                token_count=20,  # Tiny overestimate
+                                message=tool_response,
+                                token_count=response_token_count,
                                 message_type=MessageType.TOOL_CALL_RESPONSE,
                                 image_files=None,
                                 tool_call_id=tool_call.tool_call_id,

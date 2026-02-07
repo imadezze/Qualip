@@ -233,6 +233,11 @@ const collections = (
               icon: SvgShield,
               link: "/admin/token-rate-limits",
             },
+            {
+              name: "Query History",
+              icon: SvgServer,
+              link: "/admin/query-history",
+            },
           ],
         },
         ...(enableEnterprise
