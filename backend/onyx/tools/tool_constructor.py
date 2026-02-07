@@ -56,6 +56,9 @@ class SearchToolConfig(BaseModel):
     additional_context: str | None = None
     slack_context: SlackContext | None = None
     enable_slack_search: bool = True
+    # When True, SearchTool will crawl URLs found in user queries
+    # This is activated when WebSearchTool toggle is enabled in the UI
+    enable_url_crawling: bool = False
 
 
 class CustomToolConfig(BaseModel):
@@ -133,6 +136,18 @@ def construct_tools(
             )
         return document_index_cache
 
+    # Check if WebSearchTool is enabled via allowed_tool_ids
+    # If so, we'll enable URL crawling in SearchTool instead of using WebSearchTool
+    web_search_enabled = False
+    if allowed_tool_ids is not None:
+        for db_tool in persona.tools:
+            if (
+                db_tool.in_code_tool_id == WebSearchTool.__name__
+                and db_tool.id in allowed_tool_ids
+            ):
+                web_search_enabled = True
+                break
+
     added_search_tool = False
     for db_tool_model in persona.tools:
         # If allowed_tool_ids is specified, skip tools not in the allowed list
@@ -180,6 +195,8 @@ def construct_tools(
                     bypass_acl=search_tool_config.bypass_acl,
                     slack_context=search_tool_config.slack_context,
                     enable_slack_search=search_tool_config.enable_slack_search,
+                    # Enable URL crawling when user toggles "Web Search" button
+                    enable_url_crawling=web_search_enabled or search_tool_config.enable_url_crawling,
                 )
 
                 tool_dict[db_tool_model.id] = [search_tool]
@@ -210,16 +227,15 @@ def construct_tools(
                 ]
 
             # Handle Web Search Tool
+            # NOTE: WebSearchTool functionality is now handled by SearchTool's URL crawling.
+            # When web search is enabled, we skip creating WebSearchTool and instead
+            # enable URL crawling in SearchTool (handled above via web_search_enabled flag).
             elif tool_cls.__name__ == WebSearchTool.__name__:
-                try:
-                    tool_dict[db_tool_model.id] = [
-                        WebSearchTool(tool_id=db_tool_model.id, emitter=emitter)
-                    ]
-                except ValueError as e:
-                    logger.error(f"Failed to initialize Internet Search Tool: {e}")
-                    raise ValueError(
-                        "Internet search tool requires a search provider API key, please contact your Onyx admin to get it added!"
-                    )
+                # Skip - URL crawling is now handled by SearchTool
+                logger.debug(
+                    "WebSearchTool toggle enabled - URL crawling activated in SearchTool"
+                )
+                continue
 
             # Handle Open URL Tool
             elif tool_cls.__name__ == OpenURLTool.__name__:
