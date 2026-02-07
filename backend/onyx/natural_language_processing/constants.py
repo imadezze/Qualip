@@ -11,7 +11,7 @@ from shared_configs.enums import EmbedTextType
 
 # Default model names for different providers
 DEFAULT_OPENAI_MODEL = "text-embedding-3-small"
-DEFAULT_COHERE_MODEL = "embed-english-light-v3.0"
+DEFAULT_COHERE_MODEL = "embed-multilingual-v3.0"
 DEFAULT_VOYAGE_MODEL = "voyage-large-2-instruct"
 DEFAULT_VERTEX_MODEL = "text-embedding-005"
 

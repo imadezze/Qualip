@@ -85,8 +85,8 @@ export const AVAILABLE_MODELS: HostedEmbeddingModel[] = [
     model_dim: 768,
     normalize: true,
     description:
-      "The recommended default for most situations. If you aren't sure which model to use, this is probably the one.",
-    isDefault: true,
+      "Recommended for self-hosted deployments. Good English-only model that runs locally without API keys.",
+    isDefault: false,
     link: "https://huggingface.co/nomic-ai/nomic-embed-text-v1",
     query_prefix: "search_query: ",
     passage_prefix: "search_document: ",
@@ -187,6 +187,34 @@ export const AVAILABLE_CLOUD_PROVIDERS: CloudEmbeddingProvider[] = [
     apiLink: "https://dashboard.cohere.ai/api-keys",
     costslink: "https://cohere.com/pricing",
     embedding_models: [
+      {
+        provider_type: EmbeddingProvider.COHERE,
+        model_name: "embed-multilingual-v3.0",
+        description:
+          "Cohere's multilingual embedding model. Best for English + French and 100+ languages.",
+        pricePerMillion: 0.1,
+        model_dim: 1024,
+        normalize: false,
+        query_prefix: "",
+        passage_prefix: "",
+        index_name: "",
+        api_key: null,
+        api_url: null,
+      },
+      {
+        provider_type: EmbeddingProvider.COHERE,
+        model_name: "embed-multilingual-light-v3.0",
+        description:
+          "Cohere's lightweight multilingual model. Faster and more efficient for simpler multilingual tasks.",
+        pricePerMillion: 0.1,
+        model_dim: 384,
+        normalize: false,
+        query_prefix: "",
+        passage_prefix: "",
+        index_name: "",
+        api_key: null,
+        api_url: null,
+      },
       {
         provider_type: EmbeddingProvider.COHERE,
         model_name: "embed-english-v3.0",
