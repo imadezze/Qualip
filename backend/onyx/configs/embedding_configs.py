@@ -21,6 +21,18 @@ class SupportedEmbeddingModel(BaseModel):
 # Base embedding model configurations (without precision)
 _BASE_EMBEDDING_MODELS = [
     # Cloud-based models
+    # Cohere Multilingual models (English + French + 100+ languages)
+    _BaseEmbeddingModel(
+        name="cohere/embed-multilingual-v3.0",
+        dim=1024,
+        index_name="danswer_chunk_cohere_embed_multilingual_v3_0",
+    ),
+    _BaseEmbeddingModel(
+        name="cohere/embed-multilingual-light-v3.0",
+        dim=384,
+        index_name="danswer_chunk_cohere_embed_multilingual_light_v3_0",
+    ),
+    # Cohere English-only models
     _BaseEmbeddingModel(
         name="cohere/embed-english-v3.0",
         dim=1024,
