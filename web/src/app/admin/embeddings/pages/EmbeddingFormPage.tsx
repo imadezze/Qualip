@@ -553,12 +553,12 @@ export default function EmbeddingForm() {
                   <ul className="list-disc list-inside mt-2 ml-4">
                     <li>
                       <Text as="p">
-                        Cohere embed-english-v3.0 for cloud-based
+                        Cohere embed-multilingual-v3.0 for cloud-based (supports English + French)
                       </Text>
                     </li>
                     <li>
                       <Text as="p">
-                        Nomic nomic-embed-text-v1 for self-hosted
+                        Nomic nomic-embed-text-v1 for self-hosted (English only)
                       </Text>
                     </li>
                   </ul>

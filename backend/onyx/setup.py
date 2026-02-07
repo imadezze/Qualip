@@ -2,6 +2,7 @@ import time
 
 from sqlalchemy.orm import Session
 
+from onyx.configs.app_configs import COHERE_DEFAULT_API_KEY
 from onyx.configs.app_configs import DISABLE_INDEX_UPDATE_ON_SWAP
 from onyx.configs.app_configs import INTEGRATION_TESTS_MODE
 from onyx.configs.app_configs import MANAGED_VESPA
@@ -29,6 +30,7 @@ from onyx.db.index_attempt import cancel_indexing_attempts_past_model
 from onyx.db.index_attempt import expire_index_attempts
 from onyx.db.llm import fetch_default_provider
 from onyx.db.llm import update_default_provider
+from onyx.db.llm import upsert_cloud_embedding_provider
 from onyx.db.llm import upsert_llm_provider
 from onyx.db.search_settings import get_active_search_settings
 from onyx.db.search_settings import get_current_search_settings
@@ -47,6 +49,7 @@ from onyx.llm.well_known_providers.llm_provider_options import get_openai_model_
 from onyx.natural_language_processing.search_nlp_models import EmbeddingModel
 from onyx.natural_language_processing.search_nlp_models import warm_up_bi_encoder
 from onyx.seeding.load_yamls import load_input_prompts_from_yaml
+from onyx.server.manage.embedding.models import CloudEmbeddingProviderCreationRequest
 from onyx.server.manage.llm.models import LLMProviderUpsertRequest
 from onyx.server.manage.llm.models import ModelConfigurationUpsertRequest
 from onyx.server.settings.store import load_settings
@@ -57,9 +60,67 @@ from shared_configs.configs import ALT_INDEX_SUFFIX
 from shared_configs.configs import MODEL_SERVER_HOST
 from shared_configs.configs import MODEL_SERVER_PORT
 from shared_configs.configs import MULTI_TENANT
+from shared_configs.enums import EmbeddingProvider
 
 
 logger = setup_logger()
+
+
+def setup_cohere_embedding_provider(db_session: Session) -> bool:
+    """
+    Configure Cohere as the embedding provider if:
+    1. COHERE_DEFAULT_API_KEY is set
+    2. Current search settings use a Cohere model (model_name contains 'cohere/' or 'embed-multilingual' or 'embed-english')
+    3. provider_type is not already set
+    
+    Returns True if Cohere was configured, False otherwise.
+    """
+    if not COHERE_DEFAULT_API_KEY:
+        logger.info(
+            "COHERE_DEFAULT_API_KEY not set, skipping Cohere embedding provider auto-configuration"
+        )
+        return False
+
+    search_settings = get_current_search_settings(db_session)
+    
+    # Check if this is a Cohere model that needs provider configuration
+    model_name = search_settings.model_name.lower()
+    is_cohere_model = (
+        "cohere/" in model_name or 
+        "embed-multilingual" in model_name or 
+        "embed-english" in model_name
+    )
+    
+    if not is_cohere_model:
+        return False
+    
+    # Already configured with a provider
+    if search_settings.provider_type is not None:
+        logger.debug("Embedding provider already configured, skipping Cohere auto-setup")
+        return search_settings.provider_type == EmbeddingProvider.COHERE
+
+    try:
+        logger.notice("Configuring Cohere embedding provider for single-tenant mode")
+        
+        # Register the Cohere cloud embedding provider
+        cloud_embedding_provider = CloudEmbeddingProviderCreationRequest(
+            provider_type=EmbeddingProvider.COHERE,
+            api_key=COHERE_DEFAULT_API_KEY,
+        )
+        upsert_cloud_embedding_provider(db_session, cloud_embedding_provider)
+        
+        # Update search settings to use Cohere provider
+        search_settings.provider_type = EmbeddingProvider.COHERE
+        db_session.commit()
+        
+        logger.notice(
+            f"Successfully configured Cohere embedding provider with model: {search_settings.model_name}"
+        )
+        return True
+        
+    except Exception:
+        logger.exception("Failed to configure Cohere embedding provider")
+        return False
 
 
 def setup_onyx(
@@ -72,6 +133,10 @@ def setup_onyx(
     The Tenant Service calls the tenants/create endpoint which runs this.
     """
     check_and_perform_index_swap(db_session=db_session)
+
+    # For single-tenant mode, auto-configure Cohere if API key is available
+    if not MULTI_TENANT:
+        setup_cohere_embedding_provider(db_session)
 
     active_search_settings = get_active_search_settings(db_session)
     search_settings = active_search_settings.primary

@@ -464,14 +464,14 @@ def configure_default_api_keys(db_session: Session) -> None:
 
             if current_search_settings:
                 current_search_settings.model_name = (
-                    "embed-english-v3.0"  # Cohere's latest model as of now
+                    "embed-multilingual-v3.0"  # Cohere's multilingual model for English + French
                 )
                 current_search_settings.model_dim = (
-                    1024  # Cohere's embed-english-v3.0 dimension
+                    1024  # Cohere's embed-multilingual-v3.0 dimension
                 )
                 current_search_settings.provider_type = EmbeddingProvider.COHERE
                 current_search_settings.index_name = (
-                    "danswer_chunk_cohere_embed_english_v3_0"
+                    "danswer_chunk_cohere_embed_multilingual_v3_0"
                 )
                 current_search_settings.query_prefix = ""
                 current_search_settings.passage_prefix = ""
