@@ -60,6 +60,127 @@ export async function OPTIONS(
   return handleRequest(request, params.path);
 }
 
+const MOCK_PERSONA = {
+  id: 0,
+  name: "CertiBot",
+  description: "Assistant Qualiopi pour les organismes de formation",
+  tools: [],
+  starter_messages: [
+    {
+      name: "Audit Qualiopi",
+      description: "Lancer un audit de conformite Qualiopi",
+      message: "Je souhaite verifier la conformite de mon dossier Qualiopi.",
+    },
+  ],
+  document_sets: [],
+  is_public: true,
+  is_visible: true,
+  display_priority: 0,
+  is_default_persona: true,
+  builtin_persona: false,
+  labels: [],
+  owner: null,
+};
+
+const MOCK_LLM_PROVIDER = {
+  name: "mock-provider",
+  provider: "openai",
+  provider_display_name: "OpenAI",
+  default_model_name: "gpt-4o",
+  is_default_provider: true,
+  is_default_vision_provider: true,
+  default_vision_model: "gpt-4o",
+  is_public: true,
+  groups: [],
+  personas: [],
+  model_configurations: [
+    {
+      model_name: "gpt-4o",
+      model_display_name: "GPT-4o",
+    },
+  ],
+};
+
+function getMockResponse(pathStr: string): unknown | null {
+  if (pathStr === "chat/get-user-chat-sessions") {
+    return { sessions: [] };
+  }
+  if (pathStr === "persona") {
+    return [MOCK_PERSONA];
+  }
+  if (pathStr === "manage/connector-status") {
+    return [];
+  }
+  if (pathStr === "query/valid-tags") {
+    return { tags: [] };
+  }
+  if (pathStr === "manage/document-set") {
+    return [];
+  }
+  if (pathStr === "federated") {
+    return [];
+  }
+  if (pathStr === "llm/provider") {
+    return [MOCK_LLM_PROVIDER];
+  }
+  if (pathStr.match(/^llm\/persona\/\d+\/providers$/)) {
+    return [MOCK_LLM_PROVIDER];
+  }
+  if (pathStr === "user/projects/" || pathStr === "user/projects") {
+    return [];
+  }
+  if (pathStr === "user/files/recent") {
+    return [];
+  }
+  if (pathStr === "notifications") {
+    return [];
+  }
+  if (pathStr === "me") {
+    return {
+      id: "mock-user-dev",
+      email: "dev@certibot.com",
+      is_active: true,
+      is_superuser: true,
+      is_verified: true,
+      role: "admin",
+      preferences: { chosen_assistants: null, auto_scroll: true },
+    };
+  }
+  if (pathStr === "settings") {
+    return {
+      auto_scroll: true,
+      application_status: "active",
+      gpu_enabled: false,
+      maximum_chat_retention_days: null,
+      notifications: [],
+      needs_reindexing: false,
+      anonymous_user_enabled: true,
+      deep_research_enabled: true,
+      temperature_override_enabled: true,
+      query_history_type: "normal",
+    };
+  }
+  if (pathStr === "health") {
+    return { status: "ok" };
+  }
+  if (pathStr.match(/^user\/projects\/.*\/token-count$/)) {
+    return { total_tokens: 0 };
+  }
+  if (pathStr.match(/^user\/projects\/session\/.*\/token-count$/)) {
+    return { total_tokens: 0 };
+  }
+  if (pathStr.match(/^user\/projects\/session\/.*\/files$/)) {
+    return [];
+  }
+  if (pathStr === "query-history/config") {
+    return { query_history_type: "normal" };
+  }
+  if (pathStr.match(/^persona\/\d+$/)) {
+    return MOCK_PERSONA;
+  }
+  return null;
+}
+
 async function handleRequest(request: NextRequest, path: string[]) {
   if (
     process.env.NODE_ENV !== "development" &&
@@ -132,7 +253,14 @@ async function handleRequest(request: NextRequest, path: string[]) {
       });
     }
   } catch (error: unknown) {
-    console.error("Proxy error:", error);
+    const pathStr = path.join("/");
+    const mockData = getMockResponse(pathStr);
+
+    if (mockData !== null) {
+      return NextResponse.json(mockData);
+    }
+
+    console.error("Proxy error (no mock available):", pathStr, error);
     return NextResponse.json(
       {
         message: "Proxy error",
