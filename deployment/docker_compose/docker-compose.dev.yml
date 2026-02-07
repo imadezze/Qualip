@@ -13,6 +13,10 @@ services:
     ports:
       - "8080:8080"
 
+  web_server:
+    ports:
+      - "3000:3000"
+
   # Uncomment the block below to enable the MCP server for Onyx.
   # mcp_server:
   #   ports:

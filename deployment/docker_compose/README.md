@@ -4,11 +4,27 @@ To set up Onyx there are several options, Onyx supports the following for deploy
 1. Quick guided install via the install.sh script
 2. Pulling the repo and running `docker compose up -d` from the deployment/docker_compose directory
   - Note, it is recommended to copy over the env.template file to .env and edit the necessary values
-3. For large scale deployments leveraging Kubernetes, there are two options, Helm or Terraform.
+3. **For local development with hot reload (no rebuilds)**, see [QUICKSTART.dev.md](QUICKSTART.dev.md)
+4. For large scale deployments leveraging Kubernetes, there are two options, Helm or Terraform.
 
 This README focuses on the easiest guided deployment which is via install.sh.
 
 **For more detailed guides, please refer to the documentation: https://docs.onyx.app/deployment/overview**
+
+## Development Mode
+
+**🚀 NEW: Local Development with Hot Reload**
+
+If you're developing locally and want instant code changes without rebuilding Docker images:
+
+- **Quick Start**: See [QUICKSTART.dev.md](QUICKSTART.dev.md)
+- **Detailed Guide**: See [README.dev.md](README.dev.md)
+
+This setup mounts your local source code into containers and enables hot reload for:
+- ✅ Python backend (uvicorn --reload)
+- ✅ Next.js web frontend (development mode with Fast Refresh)
+- ✅ No rebuilds needed for code changes
+- ⚠️ Initial build still required for dependencies
 
 ## install.sh script
 

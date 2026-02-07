@@ -40,6 +40,12 @@ services:
     #   - ./bundle.pem:/app/bundle.pem:ro
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8080/health')\" || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
     logging:
       driver: json-file
       options:
@@ -116,7 +122,8 @@ services:
         - NEXT_PUBLIC_THEME=${NEXT_PUBLIC_THEME:-}
         - NEXT_PUBLIC_FORGOT_PASSWORD_ENABLED=${NEXT_PUBLIC_FORGOT_PASSWORD_ENABLED:-}
     depends_on:
-      - api_server
+      api_server:
+        condition: service_healthy
     restart: unless-stopped
     environment:
       - INTERNAL_URL=http://api_server:8080
@@ -190,6 +197,8 @@ services:
     build:
       context: ../../backend
       dockerfile: Dockerfile.model_server
+      target: final
+      network: host
     command: >
       /bin/sh -c "if [ \"${DISABLE_MODEL_SERVER:-}\" = \"True\" ] || [ \"${DISABLE_MODEL_SERVER:-}\" = \"true\" ]; then
         echo 'Skipping service...';
@@ -218,6 +227,8 @@ services:
     build:
       context: ../../backend
       dockerfile: Dockerfile.model_server
+      target: final
+      network: host
     command: >
       /bin/sh -c "if [ \"${DISABLE_MODEL_SERVER:-}\" = \"True\" ] || [ \"${DISABLE_MODEL_SERVER:-}\" = \"true\" ]; then
         echo 'Skipping service...';

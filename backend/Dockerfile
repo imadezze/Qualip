@@ -27,24 +27,26 @@ COPY --from=ghcr.io/astral-sh/uv:0.9.9 /uv /uvx /bin/
 # curl included just for users' convenience
 # zip for Vespa step futher down
 # ca-certificates for HTTPS
-RUN apt-get update && \
-    apt-get install -y \
-        cmake \
-        curl \
-        zip \
-        ca-certificates \
-        libgnutls30 \
-        libblkid1 \
-        libmount1 \
-        libsmartcols1 \
-        libuuid1 \
-        libxmlsec1-dev \
-        pkg-config \
-        gcc \
-        nano \
-        vim && \
-    rm -rf /var/lib/apt/lists/* && \
-    apt-get clean
+RUN for i in 1 2 3 4 5; do \
+        apt-get update && \
+        apt-get install -y \
+            cmake \
+            curl \
+            zip \
+            ca-certificates \
+            libgnutls30 \
+            libblkid1 \
+            libmount1 \
+            libsmartcols1 \
+            libuuid1 \
+            libxmlsec1-dev \
+            pkg-config \
+            gcc \
+            nano \
+            vim-tiny && \
+        rm -rf /var/lib/apt/lists/* && \
+        apt-get clean && break || sleep 15; \
+    done
 
 
 
