@@ -821,7 +821,7 @@ def upsert_persona(
     user_file_ids: list[UUID] | None = None,
     chunks_above: int = CONTEXT_CHUNKS_ABOVE,
     chunks_below: int = CONTEXT_CHUNKS_BELOW,
-    replace_base_system_prompt: bool = False,
+    replace_base_system_prompt: bool = True,
 ) -> Persona:
     """
     NOTE: This operation cannot update persona configuration options that

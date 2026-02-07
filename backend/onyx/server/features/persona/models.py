@@ -83,7 +83,7 @@ class PersonaUpsertRequest(BaseModel):
 
     # prompt fields
     system_prompt: str
-    replace_base_system_prompt: bool = False
+    replace_base_system_prompt: bool = True
     task_prompt: str
     datetime_aware: bool
 
@@ -187,7 +187,7 @@ class PersonaSnapshot(BaseModel):
 
     # Embedded prompt fields (no longer separate prompt_ids)
     system_prompt: str | None = None
-    replace_base_system_prompt: bool = False
+    replace_base_system_prompt: bool = True
     task_prompt: str | None = None
     datetime_aware: bool = True
 

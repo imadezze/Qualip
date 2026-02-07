@@ -2850,7 +2850,7 @@ class Persona(Base):
     system_prompt: Mapped[str | None] = mapped_column(
         String(length=PROMPT_LENGTH), nullable=True
     )
-    replace_base_system_prompt: Mapped[bool] = mapped_column(Boolean, default=False)
+    replace_base_system_prompt: Mapped[bool] = mapped_column(Boolean, default=True)
     task_prompt: Mapped[str | None] = mapped_column(
         String(length=PROMPT_LENGTH), nullable=True
     )

@@ -584,7 +584,7 @@ export default function AgentEditorPage({
       ? new Date(existingAgent.search_start_date)
       : null,
     replace_base_system_prompt:
-      existingAgent?.replace_base_system_prompt ?? false,
+      existingAgent?.replace_base_system_prompt ?? true,
     reminders: existingAgent?.task_prompt ?? "",
     // For new assistants, default to false for optional tools to avoid
     // "Tool not available" errors when the tool isn't configured.
