@@ -31,6 +31,8 @@ import {
   PYTHON_TOOL_ID,
   SEARCH_TOOL_ID,
   OPEN_URL_TOOL_ID,
+  PDF_GENERATOR_TOOL_ID,
+  EMAIL_SENDER_TOOL_ID,
 } from "@/app/chat/components/tools/constants";
 import Text from "@/refresh-components/texts/Text";
 import { Card } from "@/refresh-components/cards";
@@ -521,6 +523,12 @@ export default function AgentEditorPage({
   const codeInterpreterTool = availableTools?.find(
     (t) => t.in_code_tool_id === PYTHON_TOOL_ID
   );
+  const pdfGeneratorTool = availableTools?.find(
+    (t) => t.in_code_tool_id === PDF_GENERATOR_TOOL_ID
+  );
+  const emailSenderTool = availableTools?.find(
+    (t) => t.in_code_tool_id === EMAIL_SENDER_TOOL_ID
+  );
   const isImageGenerationAvailable = !!imageGenTool;
   const imageGenerationDisabledTooltip = isImageGenerationAvailable
     ? undefined
@@ -603,6 +611,18 @@ export default function AgentEditorPage({
       !!codeInterpreterTool &&
       (existingAgent?.tools?.some(
         (tool) => tool.in_code_tool_id === PYTHON_TOOL_ID
+      ) ??
+        false),
+    pdf_generator:
+      !!pdfGeneratorTool &&
+      (existingAgent?.tools?.some(
+        (tool) => tool.in_code_tool_id === PDF_GENERATOR_TOOL_ID
+      ) ??
+        false),
+    email_sender:
+      !!emailSenderTool &&
+      (existingAgent?.tools?.some(
+        (tool) => tool.in_code_tool_id === EMAIL_SENDER_TOOL_ID
       ) ??
         false),
 
@@ -748,6 +768,12 @@ export default function AgentEditorPage({
       }
       if (values.code_interpreter && codeInterpreterTool) {
         toolIds.push(codeInterpreterTool.id);
+      }
+      if (values.pdf_generator && pdfGeneratorTool) {
+        toolIds.push(pdfGeneratorTool.id);
+      }
+      if (values.email_sender && emailSenderTool) {
+        toolIds.push(emailSenderTool.id);
       }
 
       // Collect enabled MCP tool IDs
@@ -1425,6 +1451,40 @@ export default function AgentEditorPage({
                               <SwitchField
                                 name="code_interpreter"
                                 disabled={!codeInterpreterTool}
+                              />
+                            </InputLayouts.Horizontal>
+                          </Card>
+
+                          <Card
+                            variant={
+                              !!pdfGeneratorTool ? undefined : "disabled"
+                            }
+                          >
+                            <InputLayouts.Horizontal
+                              name="pdf_generator"
+                              title="PDF Generator"
+                              description="Generate PDF documents and upload to cloud storage with shareable links."
+                            >
+                              <SwitchField
+                                name="pdf_generator"
+                                disabled={!pdfGeneratorTool}
+                              />
+                            </InputLayouts.Horizontal>
+                          </Card>
+
+                          <Card
+                            variant={
+                              !!emailSenderTool ? undefined : "disabled"
+                            }
+                          >
+                            <InputLayouts.Horizontal
+                              name="email_sender"
+                              title="Email Sender"
+                              description="Send emails to recipients on behalf of the user."
+                            >
+                              <SwitchField
+                                name="email_sender"
+                                disabled={!emailSenderTool}
                               />
                             </InputLayouts.Horizontal>
                           </Card>

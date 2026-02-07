@@ -112,12 +112,32 @@ export const CustomToolRenderer: MessageRenderer<CustomToolPacket, {}> = ({
           </div>
         )}
 
-        {/* JSON/Text responses */}
-        {data !== undefined && data !== null && (
-          <div className="text-xs bg-gray-50 dark:bg-gray-800 p-3 rounded border max-h-96 overflow-y-auto font-mono whitespace-pre-wrap break-all">
-            {typeof data === "string" ? data : JSON.stringify(data, null, 2)}
-          </div>
-        )}
+        {/* PDF download link */}
+        {data !== undefined &&
+          data !== null &&
+          typeof data === "object" &&
+          data.download_url && (
+            <div className="flex items-center gap-3 p-3 rounded border bg-gray-50 dark:bg-gray-800">
+              <FiDownload className="w-5 h-5 text-blue-600 flex-shrink-0" />
+              <a
+                href={data.download_url}
+                target="_blank"
+                rel="noreferrer"
+                className="text-sm text-blue-600 hover:underline font-medium truncate"
+              >
+                {data.title || "Download PDF"}
+              </a>
+            </div>
+          )}
+
+        {/* JSON/Text responses (non-PDF) */}
+        {data !== undefined &&
+          data !== null &&
+          !(typeof data === "object" && data.download_url) && (
+            <div className="text-xs bg-gray-50 dark:bg-gray-800 p-3 rounded border max-h-96 overflow-y-auto font-mono whitespace-pre-wrap break-all">
+              {typeof data === "string" ? data : JSON.stringify(data, null, 2)}
+            </div>
+          )}
 
         {/* Show placeholder if no response data yet */}
         {!fileIds && (data === undefined || data === null) && isRunning && (

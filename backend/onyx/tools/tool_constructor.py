@@ -34,9 +34,15 @@ from onyx.tools.tool_implementations.custom.custom_tool import (
 from onyx.tools.tool_implementations.images.image_generation_tool import (
     ImageGenerationTool,
 )
+from onyx.tools.tool_implementations.email_sender.email_sender_tool import (
+    EmailSenderTool,
+)
 from onyx.tools.tool_implementations.mcp.mcp_tool import MCPTool
 from onyx.tools.tool_implementations.open_url.open_url_tool import (
     OpenURLTool,
+)
+from onyx.tools.tool_implementations.pdf_generator.pdf_generator_tool import (
+    PDFGeneratorTool,
 )
 from onyx.tools.tool_implementations.python.python_tool import PythonTool
 from onyx.tools.tool_implementations.search.search_tool import SearchTool
@@ -242,6 +248,18 @@ def construct_tools(
             elif tool_cls.__name__ == PythonTool.__name__:
                 tool_dict[db_tool_model.id] = [
                     PythonTool(tool_id=db_tool_model.id, emitter=emitter)
+                ]
+
+            # Handle PDF Generator Tool
+            elif tool_cls.__name__ == PDFGeneratorTool.__name__:
+                tool_dict[db_tool_model.id] = [
+                    PDFGeneratorTool(tool_id=db_tool_model.id, emitter=emitter)
+                ]
+
+            # Handle Email Sender Tool
+            elif tool_cls.__name__ == EmailSenderTool.__name__:
+                tool_dict[db_tool_model.id] = [
+                    EmailSenderTool(tool_id=db_tool_model.id, emitter=emitter)
                 ]
 
             # Handle KG Tool
