@@ -73,6 +73,9 @@ import ChatHeader from "@/app/chat/components/ChatHeader";
 import IconButton from "@/refresh-components/buttons/IconButton";
 import Spacer from "@/refresh-components/Spacer";
 import { DEFAULT_CONTEXT_TOKENS } from "@/lib/constants";
+import AuditPanel from "@/app/chat/qualiopi/components/AuditPanel";
+import AuditToggleButton from "@/app/chat/qualiopi/components/AuditToggleButton";
+import { useAuditState } from "@/app/chat/qualiopi/useAuditState";
 
 export interface ChatPageProps {
   firstMessage?: string;
@@ -434,6 +437,15 @@ export default function ChatPage({ firstMessage }: ChatPageProps) {
     }
   }, [documentSidebarVisible, updateCurrentDocumentSidebarVisible]);
 
+  const [auditPanelVisible, setAuditPanelVisible] = useState(false);
+  const auditState = useAuditState();
+  const toggleAuditPanel = useCallback(() => {
+    setAuditPanelVisible((prev) => !prev);
+  }, []);
+  const handleAuditPanelClose = useCallback(() => {
+    setAuditPanelVisible(false);
+  }, []);
+
   if (!user) {
     redirect("/auth/login");
   }
@@ -660,7 +672,17 @@ export default function ChatPage({ firstMessage }: ChatPageProps) {
                   onScrollButtonVisibilityChange={setShowScrollButton}
                 >
                   <AppLayouts.StickyHeader>
-                    <ChatHeader />
+                    <div className="flex items-center w-full">
+                      <div className="flex-1">
+                        <ChatHeader />
+                      </div>
+                      <div className="pr-2">
+                        <AuditToggleButton
+                          onClick={toggleAuditPanel}
+                          active={auditPanelVisible}
+                        />
+                      </div>
+                    </div>
                   </AppLayouts.StickyHeader>
                   <MessageList
                     liveAssistant={liveAssistant}
@@ -785,6 +807,29 @@ export default function ChatPage({ firstMessage }: ChatPageProps) {
       </AppLayouts.Root>
 
       {desktopDocumentSidebar}
+
+      {!settings.isMobile && (
+        <div
+          className={cn(
+            "flex-shrink-0 overflow-hidden transition-all duration-300 ease-in-out",
+            auditPanelVisible ? "w-[25rem]" : "w-[0rem]"
+          )}
+        >
+          <div className="h-full w-[25rem]">
+            <AuditPanel
+              onClose={handleAuditPanelClose}
+              chatSessionId={currentChatSessionId}
+              onboardingData={auditState.onboardingData}
+              isAuditing={auditState.isAuditing}
+              auditProgress={auditState.auditProgress}
+              auditReport={auditState.auditReport}
+              setOnboardingData={auditState.setOnboardingData}
+              runAudit={auditState.runAudit}
+              resetAudit={auditState.resetAudit}
+            />
+          </div>
+        </div>
+      )}
     </>
   );
 }
