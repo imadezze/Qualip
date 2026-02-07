@@ -1,0 +1,81 @@
+FROM node:20-alpine
+
+LABEL com.onyx.maintainer="founders@onyx.app"
+LABEL com.onyx.description="Development version of Onyx web server with hot reload"
+
+# Install libc6-compat for compatibility
+RUN apk add --no-cache libc6-compat
+
+WORKDIR /app
+
+# Copy package files first for better layer caching
+COPY package.json package-lock.json ./
+COPY lib/opal/package.json ./lib/opal/
+
+# Install dependencies
+RUN npm ci
+
+# Don't run as root
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+# Create .next directory with correct permissions BEFORE switching user
+RUN mkdir -p /app/.next /app/node_modules && \
+    chown -R nextjs:nodejs /app
+
+USER nextjs
+
+# Disable telemetry
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Environment variables for development
+ARG NEXT_PUBLIC_DEFAULT_SIDEBAR_OPEN
+ENV NEXT_PUBLIC_DEFAULT_SIDEBAR_OPEN=${NEXT_PUBLIC_DEFAULT_SIDEBAR_OPEN}
+
+ARG NEXT_PUBLIC_THEME
+ENV NEXT_PUBLIC_THEME=${NEXT_PUBLIC_THEME}
+
+ARG NEXT_PUBLIC_DO_NOT_USE_TOGGLE_OFF_DANSWER_POWERED
+ENV NEXT_PUBLIC_DO_NOT_USE_TOGGLE_OFF_DANSWER_POWERED=${NEXT_PUBLIC_DO_NOT_USE_TOGGLE_OFF_DANSWER_POWERED}
+
+ARG NEXT_PUBLIC_DISABLE_LOGOUT
+ENV NEXT_PUBLIC_DISABLE_LOGOUT=${NEXT_PUBLIC_DISABLE_LOGOUT}
+
+ARG NEXT_PUBLIC_CUSTOM_REFRESH_URL
+ENV NEXT_PUBLIC_CUSTOM_REFRESH_URL=${NEXT_PUBLIC_CUSTOM_REFRESH_URL}
+
+ARG NEXT_PUBLIC_POSTHOG_KEY
+ARG NEXT_PUBLIC_POSTHOG_HOST
+ENV NEXT_PUBLIC_POSTHOG_KEY=${NEXT_PUBLIC_POSTHOG_KEY}
+ENV NEXT_PUBLIC_POSTHOG_HOST=${NEXT_PUBLIC_POSTHOG_HOST}
+
+ARG NEXT_PUBLIC_CLOUD_ENABLED
+ENV NEXT_PUBLIC_CLOUD_ENABLED=${NEXT_PUBLIC_CLOUD_ENABLED}
+
+ARG NEXT_PUBLIC_SENTRY_DSN
+ENV NEXT_PUBLIC_SENTRY_DSN=${NEXT_PUBLIC_SENTRY_DSN}
+
+ARG NEXT_PUBLIC_GTM_ENABLED
+ENV NEXT_PUBLIC_GTM_ENABLED=${NEXT_PUBLIC_GTM_ENABLED}
+
+ARG NEXT_PUBLIC_FORGOT_PASSWORD_ENABLED
+ENV NEXT_PUBLIC_FORGOT_PASSWORD_ENABLED=${NEXT_PUBLIC_FORGOT_PASSWORD_ENABLED}
+
+ARG NEXT_PUBLIC_INCLUDE_ERROR_POPUP_SUPPORT_LINK
+ENV NEXT_PUBLIC_INCLUDE_ERROR_POPUP_SUPPORT_LINK=${NEXT_PUBLIC_INCLUDE_ERROR_POPUP_SUPPORT_LINK}
+
+ARG NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+ENV NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
+
+ARG ONYX_VERSION=0.0.0-dev
+ENV ONYX_VERSION=${ONYX_VERSION}
+
+# Source code will be mounted at runtime via volumes
+# Create anonymous volumes for node_modules and .next to prevent mounting issues
+VOLUME ["/app/node_modules", "/app/.next"]
+
+# Expose Next.js dev server port
+EXPOSE 3000
+
+# Start development server
+CMD ["npm", "run", "dev"]

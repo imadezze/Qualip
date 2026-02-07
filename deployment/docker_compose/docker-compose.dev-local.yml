@@ -1,0 +1,62 @@
+# Docker Compose Override for Local Development with Volume Mounts
+# This file mounts local source code into containers for instant reload without rebuilds
+#
+# Usage:
+#   docker compose -f docker-compose.prod.yml -f docker-compose.dev-local.yml up -d --build
+#
+# Notes:
+#   - Initial build still required once to install dependencies
+#   - Only code changes are instant - dependency changes require rebuild
+#   - Backend uses uvicorn --reload for hot reload
+#   - Web server runs in development mode with Next.js Fast Refresh
+
+services:
+  api_server:
+    volumes:
+      # Mount source code directories as read-only
+      - ../../backend/onyx:/app/onyx:ro
+      - ../../backend/ee:/app/ee:ro
+      - ../../backend/alembic:/app/alembic:ro
+      - ../../backend/alembic_tenants:/app/alembic_tenants:ro
+      - ../../backend/scripts:/app/scripts:ro
+      - ../../backend/shared_configs:/app/shared_configs:ro
+      - ../../backend/supervisord.conf:/usr/etc/supervisord.conf:ro
+      # Do NOT mount: requirements/, static/, assets/ (baked into image)
+      # Do NOT mount: /app itself (breaks dependencies)
+    command: >
+      /bin/sh -c "
+      alembic upgrade head &&
+      echo \"Starting Onyx Api Server in DEV mode with hot reload\" &&
+      uvicorn onyx.main:app --host 0.0.0.0 --port 8080 --reload --reload-dir /app/onyx --reload-dir /app/ee"
+
+  background:
+    volumes:
+      # Same mounts as api_server
+      - ../../backend/onyx:/app/onyx:ro
+      - ../../backend/ee:/app/ee:ro
+      - ../../backend/alembic:/app/alembic:ro
+      - ../../backend/alembic_tenants:/app/alembic_tenants:ro
+      - ../../backend/scripts:/app/scripts:ro
+      - ../../backend/shared_configs:/app/shared_configs:ro
+      - ../../backend/supervisord.conf:/usr/etc/supervisord.conf:ro
+    # Keep the supervisord command - it will pick up file changes
+
+  web_server:
+    # Web server requires a different approach for development
+    # Option 1: Keep using production build (no volume mount)
+    # Option 2: Use development mode (see docker-compose.dev-web.yml)
+    # For now, we keep web_server as-is (production build)
+    # To enable web development mode, use docker-compose.dev-web.yml
+    build:
+      context: ../../web
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_DISABLE_LOGOUT=${NEXT_PUBLIC_DISABLE_LOGOUT:-}
+        - NEXT_PUBLIC_THEME=${NEXT_PUBLIC_THEME:-}
+        - NEXT_PUBLIC_FORGOT_PASSWORD_ENABLED=${NEXT_PUBLIC_FORGOT_PASSWORD_ENABLED:-}
+
+  nginx:
+    # In dev mode, use HTTP-only config (no SSL/Let's Encrypt needed)
+    command: >
+      /bin/sh -c "dos2unix /etc/nginx/conf.d/run-nginx.sh
+      && /etc/nginx/conf.d/run-nginx.sh app.conf.template"

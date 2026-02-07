@@ -1,0 +1,41 @@
+# Docker Compose Override for Web Development with Hot Reload
+# This file enables Next.js development server with Fast Refresh
+#
+# Usage:
+#   docker compose -f docker-compose.prod.yml -f docker-compose.dev-local.yml -f docker-compose.dev-web.yml up -d --build
+#
+# Notes:
+#   - Runs Next.js in development mode (slower, but instant updates)
+#   - Requires initial build to install node_modules
+#   - Hot reload works for all file changes
+#   - Different behavior than production (use for development only)
+
+services:
+  web_server:
+    build:
+      context: ../../web
+      dockerfile: Dockerfile.dev
+      args:
+        - NEXT_PUBLIC_DISABLE_LOGOUT=${NEXT_PUBLIC_DISABLE_LOGOUT:-}
+        - NEXT_PUBLIC_THEME=${NEXT_PUBLIC_THEME:-}
+        - NEXT_PUBLIC_FORGOT_PASSWORD_ENABLED=${NEXT_PUBLIC_FORGOT_PASSWORD_ENABLED:-}
+    volumes:
+      # Mount source code
+      - ../../web/src:/app/src:ro
+      - ../../web/public:/app/public:ro
+      - ../../web/@types:/app/@types:ro
+      - ../../web/types:/app/types:ro
+      - ../../web/lib:/app/lib:ro
+      - ../../web/tailwind-themes:/app/tailwind-themes:ro
+      - ../../web/components.json:/app/components.json:ro
+      - ../../web/next.config.js:/app/next.config.js:ro
+      - ../../web/tailwind.config.js:/app/tailwind.config.js:ro
+      - ../../web/tsconfig.json:/app/tsconfig.json:ro
+      - ../../web/postcss.config.js:/app/postcss.config.js:ro
+      - ../../web/sentry.server.config.ts:/app/sentry.server.config.ts:ro
+      - ../../web/sentry.edge.config.ts:/app/sentry.edge.config.ts:ro
+      # Exclude node_modules and .next (keep in container)
+      # These are managed by anonymous volumes in Dockerfile.dev
+    environment:
+      - NODE_ENV=development
+    command: npm run dev

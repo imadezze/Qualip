@@ -32,6 +32,7 @@ settings.json
 /deployment/data/nginx/app.conf
 /deployment/data/nginx/mcp.conf.inc
 /deployment/data/nginx/mcp_upstream.conf.inc
+/deployment/data/certbot/
 *.sw?
 /backend/tests/regression/answer_quality/search_test_config.yaml
 *.egg-info
