@@ -68,7 +68,7 @@ backports-tarfile==1.2.0 ; python_full_version < '3.12'
     # via jaraco-context
 bcrypt==4.3.0
     # via pwdlib
-beartype==0.22.6
+beartype==0.22.9
     # via
     #   py-key-value-aio
     #   py-key-value-shared
