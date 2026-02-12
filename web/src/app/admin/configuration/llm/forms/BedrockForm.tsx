@@ -150,7 +150,7 @@ function BedrockFormInternals({
           Authentication Method
         </Text>
         <Text as="p" secondaryBody text03>
-          Choose how Onyx should authenticate with Bedrock.
+          Choose how CertiBot should authenticate with Bedrock.
         </Text>
         <Tabs
           value={authMethod || AUTH_METHOD_ACCESS_KEY}
@@ -235,7 +235,7 @@ function BedrockFormInternals({
         formikProps={formikProps}
         noModelConfigurationsMessage={
           "Fetch available models first, then you'll be able to select " +
-          "the models you want to make available in Onyx."
+          "the models you want to make available in CertiBot."
         }
         recommendedDefaultModel={null}
         shouldShowAutoUpdateToggle={false}

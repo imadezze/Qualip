@@ -486,7 +486,7 @@ export default function NRFPage({ isSidePanel = false }: NRFPageProps) {
       {!user && authTypeMetadata.authType !== AuthType.DISABLED && (
         <Modal open onOpenChange={() => {}}>
           <Modal.Content width="sm" height="sm">
-            <Modal.Header icon={SvgUser} title="Welcome to Onyx" />
+            <Modal.Header icon={SvgUser} title="Welcome to CertiBot" />
             <Modal.Body>
               {authTypeMetadata.authType === AuthType.BASIC ? (
                 <LoginPage

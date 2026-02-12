@@ -123,6 +123,8 @@ backend = [
     "mistune==0.8.4",
     "sendgrid==6.12.5",
     "exa_py==1.15.4",
+    "fpdf2==2.8.3",
+    "google-cloud-storage==2.19.0",
     "braintrust==0.3.9",
     "langfuse==3.10.0",
     "nest_asyncio==1.6.0",
