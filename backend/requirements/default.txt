@@ -319,7 +319,7 @@ google-auth-oauthlib==1.0.0
     # via onyx
 google-cloud-aiplatform==1.121.0
     # via onyx
-google-cloud-bigquery==3.38.0
+google-cloud-bigquery==3.43.0
     # via google-cloud-aiplatform
 google-cloud-core==2.5.0
     # via
