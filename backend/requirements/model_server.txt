@@ -76,7 +76,7 @@ click-plugins==1.1.1.2
     # via celery
 click-repl==0.3.0
     # via celery
-cohere==5.6.1
+cohere==7.0.8
     # via onyx
 colorama==0.4.6 ; sys_platform == 'win32'
     # via
