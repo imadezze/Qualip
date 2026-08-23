@@ -669,7 +669,7 @@ opentelemetry-exporter-otlp-proto-http==1.39.1
     # via langfuse
 opentelemetry-exporter-prometheus==0.60b1
     # via pydocket
-opentelemetry-instrumentation==0.60b1
+opentelemetry-instrumentation==0.65b0
     # via pydocket
 opentelemetry-proto==1.39.1
     # via
