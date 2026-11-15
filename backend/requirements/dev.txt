@@ -411,7 +411,7 @@ pygments==2.19.2
     #   ipython-pygments-lexers
 pyparsing==3.2.5
     # via matplotlib
-pytest==8.3.5
+pytest==9.2.0
     # via
     #   onyx
     #   pytest-alembic
