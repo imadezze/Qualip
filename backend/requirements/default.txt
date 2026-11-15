@@ -786,7 +786,7 @@ psycopg2-binary==2.9.9
     # via onyx
 puremagic==1.28
     # via onyx
-pwdlib==0.2.1
+pwdlib==0.3.1
     # via fastapi-users
 py==1.11.0
     # via retry
