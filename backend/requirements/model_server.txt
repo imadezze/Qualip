@@ -409,7 +409,7 @@ safetensors==0.5.3
     #   accelerate
     #   onyx
     #   transformers
-scikit-learn==1.7.2
+scikit-learn==1.9.1
     # via sentence-transformers
 scipy==1.16.3
     # via
